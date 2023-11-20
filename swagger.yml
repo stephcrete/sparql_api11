@@ -1,0 +1,174 @@
+# swagger.yml
+
+openapi: 3.0.0
+info:
+  title: "Statistical Classifications (from LoD)"
+  description: "An API on querying statistical classifications from a valid SPARQL endpoint."
+  version: "1.0.0"
+
+servers:
+  - url: "/api"
+
+components:
+  schemas:
+    Classification:
+      type: "object"
+      required:
+        - agency_id
+      properties:
+        agency_id:
+          type: "string"
+  parameters:
+    agency_id:
+      name: "agency_id"
+      description: "Agency identifier (e.g. FAO, ESTAT, INSEE)"
+      in: path
+      required: True
+      schema:
+        type: "string"
+        enum:
+          - FAO
+          - ESTAT
+          - INSEE
+        default:
+          ESTAT
+    notation:
+      name: "notation"
+      description: "Concept scheme notation"
+      in: path
+      required: True
+      schema:
+        type: "string"
+    code_id:
+      name: "code_id"
+      description: "Statistical Classification notation identifier"
+      in: path
+      required: True
+      schema:
+        type: "string"
+    uri:
+      name: "uri"
+      description: "Concept scheme URI"
+      in: query
+      required: True
+      schema:
+        type: "string"
+      examples:
+        ESTAT:
+          value: http://data.europa.eu/ux2/nace2.1/nace2.1
+          summary: ESTAT example of a concept scheme URI
+        FAO:
+          value: https://stats.fao.org/classifications/CPC/v2.1/FAO-fisheries
+          summary: FAO example of a concept scheme URI
+        INSEE:
+          value: http://id.insee.fr/codes/coicop1998/coicop
+          summary: INSEE example of a concept scheme URI
+
+paths:
+  /{agency_id}/statisticalClassification:
+    get:
+      operationId: "classification.read_all"
+      tags:
+        - "Statistical Classifications"
+      summary: "Read the list of classifications"
+      parameters:
+        - $ref: "#/components/parameters/agency_id"
+        - name: format
+          description: The return format type.
+          in: query
+          schema:
+            type: string
+            enum:
+              - JSON
+              - CSV
+              - XML
+            default:
+              JSON
+      responses:
+        "200":
+          description: "Successfully the list of Statistical Classifications"
+
+  /{agency_id}/statisticalClassification/_uri_/item:
+    get:
+      operationId: "classification_item.read_one_by_uri"
+      tags:
+        - "Statistical Classification Items"
+      summary: "Returns all items for a given statistical classifications (by URI)."
+      parameters:
+        - $ref: "#/components/parameters/agency_id"
+        - $ref: "#/components/parameters/uri"
+        - name: format
+          description: The return format type.
+          in: query
+          schema:
+            type: string
+            enum:
+              - JSON
+              - CSV
+              - XML
+              - TURTLE
+              - JSONLD
+              - RDFXML
+            default:
+              JSON
+      responses:
+        "200":
+          description: Successfully returned the list of Statistical Classification with uri {uri}
+
+  /{agency_id}/statisticalClassification/{notation}/item:
+    get:
+      operationId: "classification_item.read_one_by_notation"
+      tags:
+        - "Statistical Classification Items"
+      summary: "Returns all items for a given statistical classifications (by Notation)."
+      parameters:
+        - $ref: "#/components/parameters/agency_id"
+        - $ref: "#/components/parameters/notation"
+        - name: format
+          description: The return format type.
+          in: query
+          schema:
+            type: string
+            enum:
+              - JSON
+              - CSV
+              - XML
+              - TURTLE
+              - JSONLD
+              - RDFXML
+            default:
+              JSON
+      responses:
+        "200":
+          description: "Successfully the list of Statistical Classifications"
+
+
+  /{agency_id}/statisticalClassification/_uri_/item/{code_id}:
+    get:
+      operationId: "classification_item.read_one_item_by_uri"
+      tags:
+        - "Statistical Classification Items"
+      summary: "Returns specific statistical classification Item."
+      parameters:
+        - $ref: "#/components/parameters/agency_id"
+        - $ref: "#/components/parameters/uri"
+        - $ref: "#/components/parameters/code_id"
+        - name: format
+          description: The return format type.
+          in: query
+          schema:
+            type: string
+            enum:
+              - JSON
+              - CSV
+              - XML
+              - TURTLE
+              - RDFXML
+              - JSONLD
+            default:
+              JSON
+      responses:
+        "200":
+          description: Successfully returned Statistical Classification Item
+
+
